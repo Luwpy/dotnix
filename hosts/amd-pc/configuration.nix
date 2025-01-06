@@ -15,6 +15,14 @@
     enable = true;
     device = "nodev";
     useOSProber = true;
+    extraEntries = ''
+      menuentry "Windows Boot Manager" {
+        insmod part_gpt
+        insmod fat
+        set root=(hd1,gpt1)  # Adjust this based on the output from fdisk
+        chainloader /EFI/Microsoft/Boot/bootmgfw.efi
+      }
+    '';
   };
 
   services.openssh.enable = true;
@@ -99,6 +107,10 @@
     qemu
 
     mesa
+
+    openssl
+    wl-clipboard
+    spotify-cli-linux
   ];
 
   services.pipewire = {

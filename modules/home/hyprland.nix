@@ -1,17 +1,18 @@
 {
-  pkgs,
-  lib,
   config,
+  lib,
+  pkgs,
   inputs,
   ...
-}: {
+}:
+with lib; {
   options = {
     wms.hypr = {
-      enable = lib.mkEnableOption "habilita Hyprlando a nível de sistema.";
+      enable = mkEnableOption "Enable Hyprland as the Wayland window manager at the system level.";
     };
   };
 
-  config = lib.mkIf config.wms.hypr.enable {
+  config = mkIf config.wms.hypr.enable {
     wayland.windowManager.hyprland = {
       enable = true;
       package = inputs.hyprland.packages.${pkgs.system}.default;
@@ -19,132 +20,223 @@
       plugins = [];
 
       settings = {
-        exec-once = [
-        ];
+        "$alt" = "ALT";
+        "$win" = "SUPER";
 
         monitor = [
-          ",preferred,auto,1"
+          "eDP-1, 1920x1080@90, 0x0, 1"
+          "DP-6, 1920x1080@90, -1920x0, 1" # left
+          "DP-5, 1920x1080@90, 0x1920, 1" # right
         ];
 
-        general = {
-          layout = "dwindle";
-          resize_on_border = true;
-        };
+        env = [
+          "XDG_CURRENT_DESKTOP,Hyprland"
+          "XDG_SESSION_TYPE,wayland"
+          "XDG_SESSION_DESKTOP,Hyprland"
+          "XCURSOR_SIZE,36"
+          "QT_QPA_PLATFORM,wayland"
+          "XDG_SCREENSHOTS_DIR,~/screens"
+        ];
 
-        misc = {
-          disable_splash_rendering = true;
-          force_default_wallpaper = 1;
+        debug = {
+          disable_logs = false;
+          enable_stdout_logs = true;
         };
 
         input = {
-          kb_layout = "br";
+          kb_layout = "br"; # Set keyboard layout to Brazilian ABNT2
+          kb_variant = "abnt2"; # ABNT2 variant
           follow_mouse = 1;
+
           touchpad = {
-            natural_scroll = "yes";
-            disable_while_typing = true;
-            drag_lock = true;
+            natural_scroll = true;
           };
-          sensitivity = 0;
-          float_switch_override_focus = 2;
+
+          sensitivity = 0; # -1.0 to 1.0, 0 means no modification.
+        };
+
+        general = {
+          gaps_in = 5;
+          gaps_out = 20;
+          border_size = 3;
+          "col.active_border" = "rgba(ffffffee) rgba(ffffffee) 45deg";
+          "col.inactive_border" = "rgba(595959aa)";
+          layout = "dwindle";
+        };
+
+        decoration = {
+          rounding = 10;
+
+          blur = {
+            enabled = true;
+            size = 16;
+            passes = 2;
+            new_optimizations = true;
+          };
+
+          drop_shadow = true;
+          shadow_range = 4;
+          shadow_render_power = 3;
+          "col.shadow" = "rgba(1a1a1aee)";
+        };
+
+        animations = {
+          enabled = true;
+          bezier = "myBezier, 0.05, 0.9, 0.1, 1.05";
+
+          animation = [
+            "windows,     1, 7,  myBezier"
+            "windowsOut,  1, 7,  default, popin 80%"
+            "border,      1, 10, default"
+            "borderangle, 1, 8,  default"
+            "fade,        1, 7,  default"
+            "workspaces,  1, 6,  default"
+          ];
         };
 
         dwindle = {
-          pseudotile = "yes";
-          preserve_split = "yes";
-          # no_gaps_when_only = "yes";
+          pseudotile = true;
+          preserve_split = true;
         };
 
         gestures = {
           workspace_swipe = true;
-          workspace_swipe_touch = true;
-          workspace_swipe_use_r = true;
+          workspace_swipe_fingers = 3;
+          workspace_swipe_invert = false;
+          workspace_swipe_distance = 200;
+          workspace_swipe_forever = true;
         };
 
-        windowrule = let
-          f = regex: "float, ^(${regex})$";
-        in [
-          (f "org.gnome.Calculator")
-          (f "org.gnome.Nautilus")
-          (f "pavucontrol")
-          (f "nm-connection-editor")
-          (f "blueberry.py")
-          (f "org.gnome.Settings")
-          (f "org.gnome.design.Palette")
-          (f "Color Picker")
-          (f "xdg-desktop-portal")
-          (f "xdg-desktop-portal-gnome")
-          (f "de.haeckerfelix.Fragments")
-          "workspace 7, title:Spotify"
+        misc = {
+          animate_manual_resizes = true;
+          animate_mouse_windowdragging = true;
+          enable_swallow = true;
+          render_ahead_of_time = false;
+          disable_hyprland_logo = true;
+        };
+
+        windowrule = [
+          "float, ^(imv)$"
+          "float, ^(mpv)$"
+          "opacity 0.85, kitty"
+          "opacity 0.85, obsidian"
         ];
 
-        decoration = {
-          shadow = {
-            range = 6;
-            render_power = 2;
-          };
+        exec-once = [
+          "swww init"
+          "swww img ~/media/photos/wallpapers/wave.png"
+          "duplicati-server"
+          "xwaylandvideobridge"
+          "waybar"
+          "flameshot"
+          "nm-applet"
+          "gsettings set org.gnome.desktop.interface gtk-theme 'Adapta-Nokto'"
+          "wl-paste --type text --watch cliphist store"
+          "wl-paste --type image --watch cliphist store"
+        ];
 
-          dim_inactive = false;
+        bind = [
+          # Applications
+          "$win, D, exec, discord"
+          "$win, E, exec, nemo"
+          "$win, F, exec, flameshot launcher"
+          "$win, H, exec, grim -g \"$(slurp)\" - | wl-copy"
+          "$win, I, exec, cinnamon-settings"
+          "$win, M, exec, wdisplays"
+          "$win, O, exec, obsidian"
+          "$win, R, exec, obs"
+          "$win, S, exec, spotify"
+          "$win, U, exec, cinnamon-settings sound"
+          "$win, V, exec, firefox --ProfileManager"
+          "$win, Q, exec, virt-manager"
 
-          blur = {
-            enabled = true;
-            size = 8;
-            passes = 3;
-            new_optimizations = "on";
-            noise = 0.01;
-            contrast = 0.9;
-            brightness = 0.8;
-            popups = true;
-          };
-        };
+          "$win, L, exec, swaylock"
+          "$alt, V, exec, cliphist list | wofi --dmenu | cliphist decode | wl-copy"
+          "$alt, Return, exec, kitty"
+          "$alt SHIFT, Q, killactive,"
+          "$alt SHIFT, E, exit,"
+          "$alt SHIFT, SPACE, togglefloating,"
+          "$alt, S, exec, wofi --show drun"
+          "$alt, P, pseudo,"
+          "$alt, T, togglesplit,"
+          "$alt, F, fullscreen"
 
-        animations = {
-          enabled = "yes";
-          bezier = "myBezier, 0.05, 0.9, 0.1, 1.05";
-          animation = [
-            "windows, 1, 5, myBezier"
-            "windowsOut, 1, 7, default, popin 80%"
-            "border, 1, 10, default"
-            "fade, 1, 7, default"
-            "workspaces, 1, 6, default"
-          ];
-        };
+          # Move focus with alt + arrow keys
+          "$alt, h, movefocus, l"
+          "$alt, l, movefocus, r"
+          "$alt, k, movefocus, u"
+          "$alt, j, movefocus, d"
 
-        "plugin:touch_gestures" = {
-          sensitivity = 8.0;
-          workspace_swipe_fingers = 3;
-          long_press_delay = 400;
-          edge_margin = 16;
-          hyprgrass-bind = [
-            ", edge:r:l, workspace, +1"
-            ", edge:l:r, workspace, -1"
-            ", edge:d:u, exec, marble toggle launcher"
-          ];
-        };
+          # Moving windows
+          "$alt SHIFT, left,  swapwindow, l"
+          "$alt SHIFT, right, swapwindow, r"
+          "$alt SHIFT, up,    swapwindow, u"
+          "$alt SHIFT, down,  swapwindow, d"
+          "$alt SHIFT, h,     swapwindow, l"
+          "$alt SHIFT, l,     swapwindow, r"
+          "$alt SHIFT, k,     swapwindow, u"
+          "$alt SHIFT, j,     swapwindow, d"
 
-        # plugin = {
-        #   overview = {
-        #     centerAligned = true;
-        #     hideTopLayers = true;
-        #     hideOverlayLayers = true;
-        #     showNewWorkspace = true;
-        #     exitOnClick = true;
-        #     exitOnSwitch = true;
-        #     drawActiveWorkspace = true;
-        #     reverseSwipe = true;
-        #   };
-        #
-        #   hyprbars = {
-        #     bar_color = "rgb(2a2a2a)";
-        #     bar_height = 28;
-        #     col_text = "rgba(ffffffdd)";
-        #     bar_text_size = 11;
-        #     bar_text_font = "Ubuntu Nerd Font";
-        #
-        #     buttons = {
-        #       button_size = 0;
-        #       "col.maximize" = "rgba(ffffff11)";
-        #       "col.close" = "rgba(ff111133)";
-        #     };
+          # Window resizing
+          "$alt CTRL SHIFT, left,  resizeactive, -60 0"
+          "$alt CTRL SHIFT, right, resizeactive,  60 0"
+          "$alt CTRL SHIFT, up,    resizeactive,  0 -60"
+          "$alt CTRL SHIFT, down,  resizeactive,  0  60"
+          "$alt CTRL SHIFT, h,     resizeactive, -60 0"
+          "$alt CTRL SHIFT, l,     resizeactive,  60 0"
+          "$alt CTRL SHIFT, k,     resizeactive,  0 -60"
+          "$alt CTRL SHIFT, j,     resizeactive,  0  60"
+
+          # Switch workspaces with alt + [0-9]
+          "$alt, 1, workspace, 1"
+          "$alt, 2, workspace, 2"
+          "$alt, 3, workspace, 3"
+          "$alt, 4, workspace, 4"
+          "$alt, 5, workspace, 5"
+          "$alt, 6, workspace, 6"
+          "$alt, 7, workspace, 7"
+          "$alt, 8, workspace, 8"
+          "$alt, 9, workspace, 9"
+          "$alt, 0, workspace, 10"
+
+          # Move active window to a workspace with alt + SHIFT + [0-9]
+          "$alt SHIFT, 1, movetoworkspacesilent, 1"
+          "$alt SHIFT, 2, movetoworkspacesilent, 2"
+          "$alt SHIFT, 3, movetoworkspacesilent, 3"
+          "$alt SHIFT, 4, movetoworkspacesilent, 4"
+          "$alt SHIFT, 5, movetoworkspacesilent, 5"
+          "$alt SHIFT, 6, movetoworkspacesilent, 6"
+          "$alt SHIFT, 7, movetoworkspacesilent, 7"
+          "$alt SHIFT, 8, movetoworkspacesilent, 8"
+          "$alt SHIFT, 9, movetoworkspacesilent, 9"
+          "$alt SHIFT, 0, movetoworkspacesilent, 10"
+
+          # Scroll through existing workspaces with alt + scroll
+          "$alt, mouse_down, workspace, e+1"
+          "$alt, mouse_up, workspace, e-1"
+
+          # Keyboard backlight
+          "$alt, F3, exec, brightnessctl -d *::kbd_backlight set +33%"
+          "$alt, F2, exec, brightnessctl -d *::kbd_backlight set 33%-"
+
+          # Volume and Media Control
+          ", XF86AudioRaiseVolume, exec, pamixer -i 5 "
+          ", XF86AudioLowerVolume, exec, pamixer -d 5 "
+          ", XF86AudioMute, exec, pamixer -t"
+          ", XF86AudioMicMute, exec, pamixer --default-source -m"
+
+          # Brightness control
+          ", XF86MonBrightnessDown, exec, brightnessctl set 5%- "
+          ", XF86MonBrightnessUp, exec, brightnessctl set +5% "
+          "$alt, B, exec, pkill -SIGUSR1 waybar"
+          "$alt SHIFT, B, exec, pkill waybar & hyprctl dispatch exec waybar"
+          "$alt, W, exec, pkill -SIGUSR2 waybar"
+        ];
+
+        bindm = [
+          "$alt, mouse:272, movewindow"
+          "$alt, mouse:273, resizewindow"
+        ];
       };
     };
   };

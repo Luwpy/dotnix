@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.11";
 
     disko = {
       url = "github:nix-community/disko";
@@ -27,8 +28,8 @@
     stylix.url = "github:danth/stylix";
 
     ghostty = {
-          url = "github:ghostty-org/ghostty";
-        };
+      url = "github:ghostty-org/ghostty";
+    };
   };
 
   outputs = {nixpkgs, ...} @ inputs: {
@@ -36,7 +37,7 @@
       specialArgs = {inherit inputs;};
       modules = [
         inputs.disko.nixosModules.default
-        (import ./hosts/amd-pc/disko.nix {device = "/dev/sda";})
+        (import ./hosts/amd-pc/disko.nix {device = "/dev/sdb";})
 
         ./hosts/amd-pc/configuration.nix
 

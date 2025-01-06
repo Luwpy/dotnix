@@ -4,7 +4,7 @@
   config,
   inputs,
   ...
-}: {
+}:{
   options = {
     luwpy.enable = lib.mkEnableOption "enables luwpy user";
   };
@@ -14,7 +14,7 @@
       isNormalUser = true;
       initialPassword = "1726832";
       extraGroups = ["wheel" "video" "inputs"];
-      shell = pkgs.nushell;
+      shell = pkgs.fish;
     };
 
     home-manager = {

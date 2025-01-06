@@ -36,9 +36,9 @@
       ".screenrc"
     ];
 
-
     allowOther = true;
   };
 
   wms.hypr.enable = true;
+  terminals.ghostty.enable = true;
 }

@@ -11,9 +11,12 @@
       credential.helper = "store";
       github.user = "Luwpy";
       push.autoSetupRemote = true;
+      init.defaultBranch = "main";
+      user = {
+        email = "jpcastro.sp@gmail.com";
+        name = "Luwpy";
+      };
     };
-    userEmail = "jpcastro.sp@gmail.com";
-    userName = "Luwpy";
   };
 
   programs.ssh = {
