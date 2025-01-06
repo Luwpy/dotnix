@@ -136,32 +136,5 @@
 
   programs.fuse.userAllowOther = true;
 
-  stylix = {
-    cursor = {
-      name = "Bibata-Modern";
-      package = pkgs.bibata-cursors;
-    };
-
-    fonts = {
-      monospace = {
-        package = pkgs.nerdfonts.override {fonts = ["CaskaydiaMono"];};
-        name = "CaskaydiaMono Nerd Font Mono";
-      };
-      sansSerif = {
-        package = pkgs.dejavu_fonts;
-        name = "DejaVu Sans";
-      };
-      serif = {
-        package = pkgs.dejavu_fonts;
-        name = "DejaVu Serif";
-      };
-    };
-    polarity = "dark";
-
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/tokyo-night-dark.yaml";
-  };
-
   greeter.greetd.enable = true;
-
-  stylix.image = /persist/home/Downloads/wallpaper.png;
 }

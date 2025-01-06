@@ -4,7 +4,7 @@
   config,
   inputs,
   ...
-}:{
+}: {
   options = {
     luwpy.enable = lib.mkEnableOption "enables luwpy user";
   };
