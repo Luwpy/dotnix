@@ -15,15 +15,16 @@
     enable = true;
     device = "nodev";
     useOSProber = true;
-    extraEntries = ''
-      menuentry "Windows Boot Manager" {
-        insmod part_gpt
-        insmod fat
-        set root=(hd1,gpt1)  # Adjust this based on the output from fdisk
-        chainloader /EFI/Microsoft/Boot/bootmgfw.efi
-      }
-    '';
   };
+  boot.loader.grub.extraEntries = ''
+    menuentry "Windows Boot Manager" {
+      insmod part_msdos
+      insmod ntfs
+      set root=(hd1,msdos1)  # hd1 = /dev/sdb, msdos1 = partition 1
+      chainloader +1
+    }
+  '';
+
 
   services.openssh.enable = true;
 
