@@ -14,7 +14,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    stylix.url = "github:danth/stylix/ed91a20c84a80a525780dcb5ea3387dddf6cd2de";
+    stylix.url = "github:danth/stylix";
 
     ags.url = "github:Aylur/ags/";
     sops-nix.url = "github:Mic92/sops-nix";
@@ -22,6 +22,10 @@
     anyrun = {
       url = "github:anyrun-org/anyrun";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    ghostty = {
+      url = "github:ghostty-org/ghostty";
     };
   };
 
